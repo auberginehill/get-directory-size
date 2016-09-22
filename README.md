@@ -420,8 +420,8 @@
                     Run the script and report on all folders, which are found in <code>C:\dc01</code>, <code>D:\dc04</code> and <code>E:\chiore</code>. Please note that the -Path is not mandatory in this example, but it could be included, too, and the quotation marks can be left out since the path names don't contain any space characters (<code>./Get-DirectorySize -Path C:\dc01, D:\dc04, E:\chiore</code>).</li>
                 </p>
                 <p>
-                    <li><code>./Get-DirectorySize.ps1 -Path E:\chiore -Sort "Folder Name" -Descending</code><br />
-                    Run the script and report on all the folders in <code>E:\chiore</code>. Sort the data based on the "Folder Name" column and arrange the rows in the HTML Directory Size Report as descending so that last alphabets come to the top and first alphabets will be at the bottom.</li>
+                    <li><code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name" -Descending</code><br />
+                    Run the script and report on all the folders in <code>E:\chiore</code>. Sort the data based on the "Folder Name" column and arrange the rows in the HTML Directory Size Report as descending so that last alphabets come to the top and first alphabets will be at the bottom. To sort the same query in an ascending order the -Descending parameter may be left out from the query command (<code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name"</code>).</li>
                 </p>
                 <p>
                     <li><code>./Get-DirectorySize -Path C:\Users\Dropbox -Recurse</code><br />
