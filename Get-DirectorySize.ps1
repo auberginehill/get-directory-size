@@ -1006,8 +1006,8 @@ http://www.eightforums.com/tutorials/23500-temporary-files-folder-change-locatio
 ./Get-DirectorySize
 
 Run the script. Please notice to insert ./ or .\ before the script name.
-Uses the default location ($env:temp) for 'listing the contents of' and storing the 
-generated two files. Lists the folders, which are found on the first level (i.e. 
+Uses the default location ($env:temp) for 'listing the contents of' and for storing 
+the generated two files. Lists the folders, which are found on the first level (i.e. 
 search is done nonrecursively, similarly to a common command "dir", for example). 
 The output in the CSV file includes nearly 40 columns of data with each processed 
 folder name as a row, the Out-GridView has about 2/3 of the data and, in essence, 
