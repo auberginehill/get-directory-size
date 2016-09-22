@@ -1038,12 +1038,13 @@ since the path names don't contain any space characters
 (./Get-DirectorySize -Path C:\dc01, D:\dc04, E:\chiore).
 
 .EXAMPLE
-./Get-DirectorySize.ps1 -Path E:\chiore -Sort "Folder Name" -Descending
+./Get-DirectorySize -Path E:\chiore -Sort "Folder Name" -Descending
 
 Run the script and report on all the folders in E:\chiore. Sort the data based on 
 the "Folder Name" column and arrange the rows in the HTML Directory Size Report as 
 descending so that last alphabets come to the top and first alphabets will be at the 
-bottom.
+bottom. To sort the same query in an ascending order the -Descending parameter may 
+be left out from the query command (./Get-DirectorySize -Path E:\chiore -Sort "Folder Name").
 
 .EXAMPLE
 ./Get-DirectorySize -Path C:\Users\Dropbox -Recurse
