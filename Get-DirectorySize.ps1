@@ -478,10 +478,10 @@ End {
     $empty_line | Out-String
 
 
-    # Display some results in a pop-up window (Out-Gridview) - about 2/3 fits to the pop-up window
+    # Display some results in a pop-up window (Out-GridView) - about 2/3 fits to the pop-up window
     $results.PSObject.TypeNames.Insert(0,"Processed Directories")
     $results_selection = $results | Select-Object 'Directory','Owner','Size','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Read','Read ago (h)','Created on','Last Updated','BaseName','PSChildName','Last AccessTime','Last WriteTime','Creation Time','Extension','Is ReadOnly','Exists','PS Is Container','Attributes','VersionInfo','Folder Name','Name','Parent','Root','PSParentPath','PSPath','PSProvider','Last WriteTime (UTC)','Creation Time (UTC)','Last AccessTime (UTC)','PSDrive'
-    $results_selection | Sort-Object 'raw_size','Files','Subfolders' -Descending | Out-Gridview
+    $results_selection | Sort-Object 'raw_size','Files','Subfolders' -Descending | Out-GridView
 
 
     # Write all the results to a CSV-file
@@ -850,7 +850,7 @@ Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, Last WriteTime (UTC)
 Creation Time (UTC), Last AccessTime (UTC) and PSDrive is leveraged from the 
 directories totaling nearly 40 headers / columns. The full report is written to 
 a CSV-file, about 2/3 of the data is displayed in a sortable pop-up window 
-(Out-Gridview) and a Directory Size Report (as a HTML file) with the essential 
+(Out-GridView) and a Directory Size Report (as a HTML file) with the essential 
 information is invoked in the default browser. 
 
 The -ReportPath parameter defines where the files are saved. The default save 
