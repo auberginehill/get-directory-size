@@ -871,7 +871,7 @@ as an alias of -Paths. The -Path parameter determines the starting point of the
 directory size analyzation. The -Path parameter also accepts a collection of path 
 names (separated by a comma). It's not always mandatory to write -Path in the query
 command to invoke the -Path parameter, as is shown in the Examples below, since 
-Get-DirectorySize is trying to decrypt the inputted queries as good as it is 
+Get-DirectorySize is trying to decipher the inputted queries as good as it is 
 machinely possible within a 50 KB size limit.
 
 The paths should be valid file system paths to a directory (a full path name of a 
