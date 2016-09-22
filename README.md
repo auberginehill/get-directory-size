@@ -421,7 +421,7 @@
                 </p>
                 <p>
                     <li><code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name" -Descending</code><br />
-                    Run the script and report on all the folders in <code>E:\chiore</code>. Sort the data based on the "Folder Name" column and arrange the rows in the HTML Directory Size Report as descending so that last alphabets come to the top and first alphabets will be at the bottom. To sort the same query in an ascending order the -Descending parameter may be left out from the query command (<code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name"</code>).</li>
+                    Run the script and report on all the folders in <code>E:\chiore</code>. Sort the data based on the "Folder Name" column and arrange the rows in the HTML Directory Size Report as descending so that last alphabets come to the top and first alphabets will be at the bottom. To sort the same query in an ascending order the <code>-Descending</code> parameter may be left out from the query command (<code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name"</code>).</li>
                 </p>
                 <p>
                     <li><code>./Get-DirectorySize -Path C:\Users\Dropbox -Recurse</code><br />
