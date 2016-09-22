@@ -872,7 +872,7 @@ directory size analyzation. The -Path parameter also accepts a collection of pat
 names (separated by a comma). It's not always mandatory to write -Path in the query
 command to invoke the -Path parameter, as is shown in the Examples below, since 
 Get-DirectorySize is trying to decipher the inputted queries as good as it is 
-machinely possible within a 50 KB size limit.
+machinely possible within a 60 KB size limit.
 
 The paths should be valid file system paths to a directory (a full path name of a 
 directory (i.e. folder path such as C:\Windows)). In case the path name includes 
