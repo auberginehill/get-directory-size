@@ -829,6 +829,7 @@ https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize            
 http://2012sg.poshcode.org/4950                                                               # Joel Reed: "Get-DirectorySize"
 http://brianbunke.com/?p=59                                                                   # Brian: "Making PowerShell Emails Pretty"
 http://powershell.com/cs/media/p/7476.aspx                                                    # clayman2: "Disk Space"
+http://powershell.com/cs/media/p/24814.aspx						      # PowerTips Monthly Volume 2: Arrays and Hash Tables
 https://technet.microsoft.com/en-us/library/hh849719.aspx                                     # Invoke-Command
 https://technet.microsoft.com/en-us/library/hh849912.aspx                                     # Sort-Object
 
@@ -868,16 +869,16 @@ The -Path parameter accepts a collection of path names (separated by comma) and
 also takes an array of strings for paths to query.
 
 The directories are queried extensively, a wide array of properties, such as
-Directory, Owner, Size, raw_size, Files, Subfolders, Average File Size, Average
-File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), Created on,
-Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, Creation Time,
-Extension, Is ReadOnly, Exists, PS Is Container, Attributes, VersionInfo, Folder
-Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, Last WriteTime (UTC),
-Creation Time (UTC), Last AccessTime (UTC) and PSDrive is leveraged from the
-directories totaling nearly 40 headers / columns. The full report is written to
-a CSV-file, about 2/3 of the data is displayed in a sortable pop-up window
-(Out-GridView) and a Directory Size Report (as a HTML file) with the essential
-information is invoked in the default browser.
+Directory, Owner, Size, raw_size, File Count, Subfolder Count, Average File Size, 
+Average File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), 
+Created on, Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, 
+Creation Time, Extension, Is ReadOnly, Exists, PS Is Container, Attributes, 
+VersionInfo, Folder Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, 
+Last WriteTime (UTC), Creation Time (UTC), Last AccessTime (UTC) and PSDrive is 
+leveraged from the directories totaling nearly 40 headers / columns. The full 
+report is written to a CSV-file, about 2/3 of the data is displayed in a sortable 
+pop-up window (Out-GridView) and a Directory Size Report (as a HTML file) with 
+the essential information is invoked in the default browser.
 
 The -ReportPath parameter defines where the files are saved. The default save
 location of the HTML Directory Size Report (directory_size.html) and the adjacent
@@ -910,10 +911,10 @@ defined in the query $env:temp gets searched.
 
 .PARAMETER ReportPath
 Specifies where the HTML Directory Size Report and the adjacent CSV-file is to be
-saved. The default file location is $env:temp, which points to the current temporary
+saved. The default save location is $env:temp, which points to the current temporary
 file location, which is set in the system. The default -ReportPath save location is
-defined at line 16. For usage, please see the Examples below and for more information
-about $env:temp, please see the Notes section below.
+defined at line 16 with the $ReportPath variable. For usage, please see the Examples 
+below and for more information about $env:temp, please see the Notes section below.
 
 .PARAMETER Sort
 Specifies which column is the primary sort column in the HTML Directory Size Report.
@@ -982,7 +983,7 @@ it may have an impact on how long the script actually runs.
 
 Please note, that even when the -Recurse parameter is not used, and despite its toll
 to the performance of the script (speed), Get-DirectorySize will try to query some
-data, such as the overall file size of the folder, recursively. This is intended
+data, such as the overall size of the folder, recursively. This is intended
 action and is one of the key elements and main characteristics of Get-DirectorySize.
 The total size of a folder cannot be known, if all of the content is not known.
 The file count and subfolder count will, however, follow the path of the -Recurse
@@ -993,8 +994,9 @@ on whether the -Recurse parameter was used or not.
 .OUTPUTS
 Generates an HTML Directory Size Report and an adjacent CSV-file in a specified
 Report Path ($ReportPath = "$env:temp" at line 16), which is user-settable with
-the -ReportPath parameter. Also displays performance related information about the
-query process in console after the query has finished. In addition to that...
+the -ReportPath parameter. Skipped path names, if any, are reported in console. 
+Also displays performance related information about the query process in console 
+after the query has finished. In addition to that...
 
 
 One pop-up window "$results_selection" (Out-GridView) with sortable headers (with a click):
@@ -1150,6 +1152,7 @@ https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize
 http://2012sg.poshcode.org/4950
 http://brianbunke.com/?p=59
 http://powershell.com/cs/media/p/7476.aspx
+http://powershell.com/cs/media/p/24814.aspx
 https://technet.microsoft.com/en-us/magazine/hh360993.aspx
 https://msdn.microsoft.com/en-us/library/ms714434(v=vs.85).aspx
 https://technet.microsoft.com/en-us/library/hh847743.aspx
