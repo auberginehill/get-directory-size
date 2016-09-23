@@ -950,7 +950,7 @@ section for further usage examples.
     Average                 Sort by Average File Size (B)   Descending         -
     "Written Ago (h)"       Sort by Written Ago (h)          (param)       Ascending
     Written                 Sort by Written Ago (h)          (param)       Ascending
-    'Age (Days)'            Sort by Age (Days)               (param)       Ascending
+    "Age (Days)"            Sort by Age (Days)               (param)       Ascending
     Age                     Sort by Age (Days)               (param)       Ascending
     "Read ago (h)"          Sort by Read ago (h)             (param)       Ascending
     Read                    Sort by Read ago (h)             (param)       Ascending
