@@ -536,7 +536,7 @@
         <td style="padding:6px"><a href="https://github.com/auberginehill/get-directory-size">Script Homepage</a></td>
     </tr>
     <tr>
-        <th rowspan="12"></th>
+        <th rowspan="13"></th>
         <td style="padding:6px">Martin Pugh: <a href="https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize">Get-FolderSizes</a></td>
     </tr>
     <tr>
