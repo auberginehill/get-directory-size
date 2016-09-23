@@ -80,11 +80,11 @@
                     <td style="padding:6px"><a href="http://powershell.com/cs/media/p/7476.aspx">PowerTips Monthly Volume 2: Arrays and Hash Tables</a> (or one of the <a href="https://web.archive.org/web/20150714100009/http://powershell.com/cs/media/p/24814.aspx">archive.org versions</a>)</td>
                 </tr>
                 <tr>
-                    <td style="padding:6px">Microsoft Technet:</td>
+                    <td style="padding:6px">Microsoft TechNet:</td>
                     <td style="padding:6px"><a href="https://technet.microsoft.com/en-us/library/hh849719.aspx">Invoke-Command</a></td>
                 </tr>
                 <tr>
-                    <td style="padding:6px">Microsoft Technet:</td>
+                    <td style="padding:6px">Microsoft TechNet:</td>
                     <td style="padding:6px"><a href="https://technet.microsoft.com/en-us/library/hh849912.aspx">Sort-Object</a></td>
                 </tr>
             </table>
