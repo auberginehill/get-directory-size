@@ -65,14 +65,14 @@ Begin {
     # A function to add folder properties
     Function Add-FolderObject {
     	Param (
-    		$subdirectory
+    		$directory
     	)
 
 
         # Some owner queries may fail, so excluding those errors
         $owner = Try {
 
-                    (Get-Acl $subdirectory.FullName -ErrorAction SilentlyContinue).Owner
+                    (Get-Acl $directory.FullName -ErrorAction SilentlyContinue).Owner
 
                 } Catch {
 
@@ -83,53 +83,53 @@ Begin {
 
 
         # The failure message "Measure-Object : Property "Length" cannot be found in any object(s) input" when querying folders with empty subfolders is suppressed with -ErrorAction SilentlyContinue...
-        $size_bytes = (Get-ChildItem $subdirectory.FullName -Force -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum
-        $file_count = ( @(Get-ChildItem $subdirectory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $false})).Count
-        $folder_count = ( @(Get-ChildItem $subdirectory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true })).Count
-        $write = (Convert-ElapsedTime((Get-Date) - ($subdirectory.LastWriteTime)))
-        $read = (Convert-ElapsedTime((Get-Date) - ($subdirectory.LastAccessTime)))
+        $size_bytes = (Get-ChildItem $directory.FullName -Force -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum
+        $file_count = ( @(Get-ChildItem $directory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $false})).Count
+        $folder_count = ( @(Get-ChildItem $directory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true })).Count
+        $write = (Convert-ElapsedTime((Get-Date) - ($directory.LastWriteTime)))
+        $read = (Convert-ElapsedTime((Get-Date) - ($directory.LastAccessTime)))
         $average_file_size = If ($file_count -gt 0) { [Math]::Round((($size_bytes) / $file_count),0) } Else { $continue = $true}
 
 
             $obj_folder = New-Object PSObject -Property @{
 
-                    'Age (Days)'                = (New-TimeSpan -Start $subdirectory.LastWriteTime).Days
-                    'Attributes'                = $subdirectory.Attributes
+                    'Age (Days)'                = (New-TimeSpan -Start $directory.LastWriteTime).Days
+                    'Attributes'                = $directory.Attributes
                     'Average File Size'         = ConvertBytes($average_file_size)
                     'Average File Size (B)'     = $average_file_size
-                    'BaseName'                  = $subdirectory.BaseName
-                    'Created on'                = $subdirectory.CreationTime
-                    'Creation Time'             = $subdirectory.CreationTime
-                    'Creation Time (UTC)'       = $subdirectory.CreationTimeUtc
-                    'Directory'                 = $subdirectory.FullName
-                    'Exists'                    = $subdirectory.Exists
-                    'Extension'                 = $subdirectory.Extension
+                    'BaseName'                  = $directory.BaseName
+                    'Created on'                = $directory.CreationTime
+                    'Creation Time'             = $directory.CreationTime
+                    'Creation Time (UTC)'       = $directory.CreationTimeUtc
+                    'Directory'                 = $directory.FullName
+                    'Exists'                    = $directory.Exists
+                    'Extension'                 = $directory.Extension
                     'Files'                     = $file_count
                     'Subfolders'                = $folder_count
-                    'Folder Name'               = $subdirectory.FullName
-                    'Is ReadOnly'               = $subdirectory.IsReadOnly
-                    'Last AccessTime'           = $subdirectory.LastAccessTime
-                    'Last AccessTime (UTC)'     = $subdirectory.LastAccessTimeUtc
-                    'Last Updated'              = $subdirectory.LastWriteTime
-                    'Last WriteTime'            = $subdirectory.LastWriteTime
-                    'Last WriteTime (UTC)'      = $subdirectory.LastWriteTimeUtc
-                    'Name'                      = $subdirectory.Name
+                    'Folder Name'               = $directory.FullName
+                    'Is ReadOnly'               = $directory.IsReadOnly
+                    'Last AccessTime'           = $directory.LastAccessTime
+                    'Last AccessTime (UTC)'     = $directory.LastAccessTimeUtc
+                    'Last Updated'              = $directory.LastWriteTime
+                    'Last WriteTime'            = $directory.LastWriteTime
+                    'Last WriteTime (UTC)'      = $directory.LastWriteTimeUtc
+                    'Name'                      = $directory.Name
                     'Owner'                     = $owner
-                    'Parent'                    = $subdirectory.Parent
+                    'Parent'                    = $directory.Parent
                     'Read'                      = [string]$read + ' ago'
-                    'Read ago (h)'              = [Math]::Round(((New-TimeSpan -Start $subdirectory.LastAccessTime).TotalHours), 0)
-                    'PS Is Container'           = $subdirectory.PSIsContainer
-                    'PSChildName'               = $subdirectory.PSChildName
-                    'PSDrive'                   = $subdirectory.PSDrive
-                    'PSParentPath'              = $subdirectory.PSParentPath
-                    'PSPath'                    = $subdirectory.PSPath
-                    'PSProvider'                = $subdirectory.PSProvider
+                    'Read ago (h)'              = [Math]::Round(((New-TimeSpan -Start $directory.LastAccessTime).TotalHours), 0)
+                    'PS Is Container'           = $directory.PSIsContainer
+                    'PSChildName'               = $directory.PSChildName
+                    'PSDrive'                   = $directory.PSDrive
+                    'PSParentPath'              = $directory.PSParentPath
+                    'PSPath'                    = $directory.PSPath
+                    'PSProvider'                = $directory.PSProvider
                     'raw_size'                  = $size_bytes
-                    'Root'                      = $subdirectory.Root
+                    'Root'                      = $directory.Root
                     'Size'                      = ConvertBytes($size_bytes)
-                    'VersionInfo'               = $subdirectory.VersionInfo
+                    'VersionInfo'               = $directory.VersionInfo
                     'Written'                   = [string]$write + ' ago'
-                    'Written Ago (h)'           = [Math]::Round(((New-TimeSpan -Start $subdirectory.LastWriteTime).TotalHours), 0)
+                    'Written Ago (h)'           = [Math]::Round(((New-TimeSpan -Start $directory.LastWriteTime).TotalHours), 0)
 
             } # New-Object
 
