@@ -206,6 +206,18 @@
                                         <td align="center" style="padding:6px">Ascending</td>
                                     </tr>
                                     <tr>
+                                        <td style="padding:6px"><code>"Age (Days)"</code></td>
+                                        <td style="padding:6px">Sort by Age (Days)</td>
+                                        <td align="center" style="padding:6px">(param)</td>
+                                        <td align="center" style="padding:6px">Ascending</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:6px"><code>Age</code></td>
+                                        <td style="padding:6px">Sort by Age (Days)</td>
+                                        <td align="center" style="padding:6px">(param)</td>
+                                        <td align="center" style="padding:6px">Ascending</td>
+                                    </tr>
+                                    <tr>
                                         <td style="padding:6px"><code>"Read ago (h)"</code></td>
                                         <td style="padding:6px">Sort by Read ago (h)</td>
                                         <td align="center" style="padding:6px">(param)</td>
@@ -276,7 +288,7 @@
                         <h5>Parameter <code>-Recurse</code></h5>
                         <p>If the <code>-Recurse</code> parameter is added to the query command, also each and every sub-folder in any level, no matter how deep in the directory structure or behind how many sub-folders, is included individually to the report. While the <code>-Recurse</code> parameter can be used for reporting the size of all sub-folders on every sub-level, it may have an impact on how long the script actually runs.
                         <br />
-                        <br />Please note, that even when the <code>-Recurse</code> parameter is not used, Get-DirectorySize will try to query some of the data, such as the overall filecount, recursively. As per version 1.0, this is intended action despite its toll to the performance (speed) and may be the subject of further development.</p>
+                        <br />Please note, that even when the <code>-Recurse</code> parameter is not used, and despite its toll to the performance of the script (speed), Get-DirectorySize will try to query some data, such as the overall file size of the folder, recursively. This is intended action and is one of the key elements and main characteristics of Get-DirectorySize. The total size of a folder cannot be known, if all of the content is not known. The file count and subfolder count will, however, follow the path of the <code>-Recurse</code> parameter. Furthermore, since the Average File Size depends on the number of files found, the reported average file size of a folder may differ drastically depending on whether the <code>-Recurse</code> parameter was used or not.</p>
                     </li>
                 </p>
             </ul>
