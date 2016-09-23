@@ -988,7 +988,7 @@ The total size of a folder cannot be known, if all of the content is not known.
 The file count and subfolder count will, however, follow the path of the -Recurse
 parameter. Furthermore, since the Average File Size depends on the number of files
 found, the reported average file size of a folder may differ drastically depending
-on weather the -Recurse parameter was used or not.
+on whether the -Recurse parameter was used or not.
 
 .OUTPUTS
 Generates an HTML Directory Size Report and an adjacent CSV-file in a specified
