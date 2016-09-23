@@ -36,7 +36,7 @@
       <br />
       <br />To effectively use Get-DirectorySize, a path, paths or path names to a directory should be specified (with the <code>-Path</code> parameter), as by default, only <code>$env:temp</code> gets searched. The paths should be valid file system paths to a directory (a full path name of a directory (i.e. folder path such as <code>C:\Windows</code>)). In case the path name includes space characters, quotation marks around the path name are mandatory. The <code>-Path</code> parameter accepts a collection of path names (separated by comma) and also takes an array of strings for paths to query.
       <br />
-      <br />The directories are queried extensively, a wide array of properties, such as Directory, Owner, Size, raw_size, Files, Subfolders, Average File Size, Average File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), Created on, Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, Creation Time, Extension, Is ReadOnly, Exists, PS Is Container, Attributes, VersionInfo, Folder Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, Last WriteTime (UTC), Creation Time (UTC), Last AccessTime (UTC) and PSDrive is leveraged from the directories totaling nearly 40 headers / columns. The full report is written to a CSV-file, about 2/3 of the data is displayed in a sortable pop-up window (Out-GridView) and a Directory Size Report (as a HTML file) with the essential information is invoked in the default browser.
+      <br />The directories are queried extensively, a wide array of properties, such as Directory, Owner, Size, raw_size, File Count, Subfolder Count, Average File Size, Average File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), Created on, Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, Creation Time, Extension, Is ReadOnly, Exists, PS Is Container, Attributes, VersionInfo, Folder Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, Last WriteTime (UTC), Creation Time (UTC), Last AccessTime (UTC) and PSDrive is leveraged from the directories totaling nearly 40 headers / columns. The full report is written to a CSV-file, about 2/3 of the data is displayed in a sortable pop-up window (Out-GridView) and a Directory Size Report (as a HTML file) with the essential information is invoked in the default browser.
       <br />
       <br />The <code>-ReportPath</code> parameter defines where the files are saved. The default save location of the HTML Directory Size Report (<code>directory_size.html</code>) and the adjacent CSV-file (<code>directory_size.csv</code>) is <code>$env:temp</code>, which points to the current temporary file location, which is set in the system (– for more information, please see the Notes section).
       <br />
@@ -74,6 +74,10 @@
                 <tr>
                     <td style="padding:6px">clayman2:</td>
                     <td style="padding:6px"><a href="http://powershell.com/cs/media/p/7476.aspx">DiskSpace</a> (or one of the <a href="https://web.archive.org/web/20150721184135/http://powershell.com/cs/media/p/7476.aspx">archive.org versions</a>)</td>
+                </tr>
+                <tr>
+                    <td style="padding:6px">Tobias Weltner:</td>
+                    <td style="padding:6px"><a href="http://powershell.com/cs/media/p/7476.aspx">PowerTips Monthly Volume 2: Arrays and Hash Tables</a> (or one of the <a href="https://web.archive.org/web/20150714100009/http://powershell.com/cs/media/p/24814.aspx">archive.org versions</a>)</td>
                 </tr>
                 <tr>
                     <td style="padding:6px">Microsoft Technet:</td>
@@ -117,7 +121,7 @@
                 <p>
                     <li>
                         <h5>Parameter <code>-ReportPath</code></h5>
-                        <p>Specifies where the HTML Directory Size Report and the adjacent CSV-file is to be saved. The default file location is <code>$env:temp</code>, which points to the current temporary file location, which is set in the system. The default <code>-ReportPath</code> save location is defined at line 16. For usage, please see the Examples below and for more information about <code>$env:temp</code>, please see the Notes section below.</p>
+                        <p>Specifies where the HTML Directory Size Report and the adjacent CSV-file is to be saved. The default save location is <code>$env:temp</code>, which points to the current temporary file location, which is set in the system. The default <code>-ReportPath</code> save location is defined at line 16 with the $ReportPath variable. For usage, please see the Examples below and for more information about <code>$env:temp</code>, please see the Notes section below.</p>
                     </li>
                 </p>
                 <p>
@@ -288,7 +292,7 @@
                         <h5>Parameter <code>-Recurse</code></h5>
                         <p>If the <code>-Recurse</code> parameter is added to the query command, also each and every sub-folder in any level, no matter how deep in the directory structure or behind how many sub-folders, is included individually to the report. While the <code>-Recurse</code> parameter can be used for reporting the size of all sub-folders on every sub-level, it may have an impact on how long the script actually runs.
                         <br />
-                        <br />Please note, that even when the <code>-Recurse</code> parameter is not used, and despite its toll to the performance of the script (speed), Get-DirectorySize will try to query some data, such as the overall file size of the folder, recursively. This is intended action and is one of the key elements and main characteristics of Get-DirectorySize. The total size of a folder cannot be known, if all of the content is not known. The file count and subfolder count will, however, follow the path of the <code>-Recurse</code> parameter. Furthermore, since the Average File Size depends on the number of files found, the reported average file size of a folder may differ drastically depending on whether the <code>-Recurse</code> parameter was used or not.</p>
+                        <br />Please note, that even when the <code>-Recurse</code> parameter is not used, and despite its toll to the performance of the script (speed), Get-DirectorySize will try to query some data, such as the overall size of the folder, recursively. This is intended action and is one of the key elements and main characteristics of Get-DirectorySize. The total size of a folder cannot be known, if all of the content is not known. The file count and subfolder count will, however, follow the path of the <code>-Recurse</code> parameter. Furthermore, since the Average File Size depends on the number of files found, the reported average file size of a folder may differ drastically depending on whether the <code>-Recurse</code> parameter was used or not.</p>
                     </li>
                 </p>
             </ul>
@@ -306,7 +310,7 @@
         <th>:arrow_right:</th>
         <td style="padding:6px">
             <ul>
-                <li>Generates an HTML Directory Size Report and an adjacent CSV-file in a specified Report Path (<code>$ReportPath = "$env:temp"</code> at line 16), which is user-settable with the <code>-ReportPath</code> parameter. Also displays performance related information about the query process in console after the query has finished. In addition to that... </li>
+                <li>Generates an HTML Directory Size Report and an adjacent CSV-file in a specified Report Path (<code>$ReportPath = "$env:temp"</code> at line 16), which is user-settable with the <code>-ReportPath</code> parameter. Skipped path names, if any, are reported in console. Also displays performance related information about the query process in console after the query has finished. In addition to that... </li>
             </ul>
         </td>
     </tr>
@@ -544,6 +548,9 @@
     <tr>
         <td style="padding:6px">clayman2: <a href="http://powershell.com/cs/media/p/7476.aspx">DiskSpace</a> (or one of the <a href="https://web.archive.org/web/20150721184135/http://powershell.com/cs/media/p/7476.aspx">archive.org versions</a>)</td>
     </tr>
+     <tr>
+        <td style="padding:6px">Tobias Weltner: <a href="http://powershell.com/cs/media/p/7476.aspx">PowerTips Monthly Volume 2: Arrays and Hash Tables</a> (or one of the <a href="https://web.archive.org/web/20150714100009/http://powershell.com/cs/media/p/24814.aspx">archive.org versions</a>)</td>
+      </tr>
     <tr>
         <td style="padding:6px"><a href="https://technet.microsoft.com/en-us/library/hh849719.aspx">Invoke-Command</a></td>
     </tr>
