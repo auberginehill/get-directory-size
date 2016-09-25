@@ -385,7 +385,7 @@
         <th>:warning:</th>
         <td style="padding:6px">
             <ul>
-                <li>Please note that all the parameters can be used in one query command and that each of the parameters can be "tab completed" before typing them fully (by pressing the <code>[tab]</code> key.</li>
+                <li>Please note that all the parameters can be used in one query command and that each of the parameters can be "tab completed" before typing them fully (by pressing the <code>[tab]</code> key).</li>
             </ul>
         </td>
     </tr>
