@@ -16,7 +16,8 @@ Param (
 	[string]$ReportPath = "$env:temp",
     [string]$Sort = "Size",
     [switch]$Descending,
-    [switch]$Recurse
+    [switch]$Recurse,
+    [switch]$Audio
 )
 
 
@@ -25,7 +26,7 @@ Param (
 Begin {
 
 
-    # Establish some common variables
+    # Establish some common variables. Collect the results to an ArrayList, so that instead the copying the entire array into a new array in each addition (as in normal arrays), just add the latest data to the bottom with .Add(the_data_to_be_added_at_the_bottom) method. .RemoveAt([4]) tries to remove the fifth item and .Insert(0,'added at the beginning') inserts to the first positition and .Insert(7,'added to 8th') could insert something to any arbitrary position.
     $computer = $env:COMPUTERNAME
     $start_time = Get-Date
     $number_of_paths = $Paths.Count
@@ -35,10 +36,12 @@ Begin {
     $result_list = @()
     [System.Collections.ArrayList]$results = $result_list
     $titles = @()
+    $drives = @()
     $skipped = @()
     $skipped_path_names = @()
     [int[]]$steps = @()
     [int[]]$loop = @()
+    $drive_names = @{}
 
 
     # Reset the counters (important!)
@@ -48,7 +51,7 @@ Begin {
     $num_invalid_paths = 0
 
 
-    # Extra parameters for $Sort which could be used after ValidateSetAttribute               # Credit: Martin Pugh: "Get-FolderSizes"
+    # Extra parameters for $Sort which could be used after ValidateSet attribute              # Credit: Martin Pugh: "Get-FolderSizes"
     Switch ($Sort)  {
         "size"      { $Sort = "raw_size";Break }
         "average"   { $Sort = "Average File Size (B)";Break }
@@ -84,11 +87,18 @@ Begin {
 
         # The failure message "Measure-Object : Property "Length" cannot be found in any object(s) input" when querying folders with empty subfolders is suppressed with -ErrorAction SilentlyContinue...
         $size_bytes = (Get-ChildItem $directory.FullName -Force -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum
-        $file_count = ( @(Get-ChildItem $directory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $false})).Count
+        $file_count = ( @(Get-ChildItem $directory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $false })).Count
         $folder_count = ( @(Get-ChildItem $directory.FullName @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true })).Count
         $write = (Convert-ElapsedTime((Get-Date) - ($directory.LastWriteTime)))
         $read = (Convert-ElapsedTime((Get-Date) - ($directory.LastAccessTime)))
-        $average_file_size = If ($file_count -gt 0) { [Math]::Round((($size_bytes) / $file_count),0) } Else { $continue = $true}
+        $average_file_size = If ($file_count -gt 0) { [Math]::Round((($size_bytes) / $file_count),0) } Else { $continue = $true }
+
+                    $volume = New-Object System.IO.DriveInfo (($directory.Root).Name)
+
+                    $size_percent = [Math]::Round(((($size_bytes) / ($volume.TotalSize)) * 100), 1)
+                    $free_percent_volume = [Math]::Round(((($volume.AvailableFreeSpace) / ($volume.TotalSize)) * 100), 1)
+                    $used_percent_volume = [Math]::Round((((($volume.TotalSize) - ($volume.AvailableFreeSpace)) / ($volume.TotalSize)) * 100), 1)
+                    $volume_total_size = ConvertBytes($volume.TotalSize)
 
 
             $obj_folder = New-Object PSObject -Property @{
@@ -102,6 +112,7 @@ Begin {
                     'Creation Time'             = $directory.CreationTime
                     'Creation Time (UTC)'       = $directory.CreationTimeUtc
                     'Directory'                 = $directory.FullName
+                    'Drive (Size)'              = [string]$directory.Root + ' (' + $volume_total_size + ')'
                     'Exists'                    = $directory.Exists
                     'Extension'                 = $directory.Extension
                     'Files'                     = $file_count
@@ -127,9 +138,26 @@ Begin {
                     'raw_size'                  = $size_bytes
                     'Root'                      = $directory.Root
                     'Size'                      = ConvertBytes($size_bytes)
+                    'Size (%)'                  = If ($size_bytes -gt 0) { [string]$size_percent + ' %' } Else { $continue = $true }
                     'VersionInfo'               = $directory.VersionInfo
                     'Written'                   = [string]$write + ' ago'
                     'Written Ago (h)'           = [Math]::Round(((New-TimeSpan -Start $directory.LastWriteTime).TotalHours), 0)
+
+                    'Volume Available Free Space (B)'   = $volume.AvailableFreeSpace
+                    'Volume Format'	                    = $volume.DriveFormat
+                    'Volume Type'	                    = $volume.DriveType
+                    'Volume Free'	                    = ConvertBytes($volume.AvailableFreeSpace)
+                    'Volume Free (%)'	                = [string]$free_percent_volume + ' %'
+                    'Volume Is Ready'	                = $volume.IsReady
+                    'Volume Label'	                    = $volume.VolumeLabel
+                    'Volume Name'	                    = $volume.Name
+                    'Volume Root Directory'	            = $volume.RootDirectory
+                    'Volume Total Size'	                = $volume_total_size
+                    'Volume Total Free Space (B)'	    = $volume.TotalFreeSpace
+                    'Volume Total Size (B)'	            = $volume.TotalSize
+                    'Volume Used'	                    = ConvertBytes(($volume.TotalSize) - ($volume.AvailableFreeSpace))
+                    'Volume Used (%)'	                = [string]$used_percent_volume + ' %'
+                    'Volume'	                        = $volume.Name
 
             } # New-Object
 
@@ -392,6 +420,46 @@ Process {
         $titles += $path
 
 
+                # Get the drive information on unique volumes
+                $drive = New-Object System.IO.DriveInfo (($root.Root).Name)
+
+
+                If ($drive_names.ContainsKey($drive.Name)) {
+
+                    $continue = $true
+
+                } Else {
+
+                    $drive_names.Add($drive.Name, $drive.TotalSize)
+
+                    $free_percent = [Math]::Round(((($drive.AvailableFreeSpace) / ($drive.TotalSize)) * 100), 1)
+                    $used_percent = [Math]::Round((((($drive.TotalSize) - ($drive.AvailableFreeSpace)) / ($drive.TotalSize)) * 100), 1)
+
+
+                        # Add the drive as an object (with properties) to a collection of drives
+                        $drives += $obj_drive = New-Object -TypeName PSCustomObject -Property @{
+
+                                    'Available Free Space (B)'      = $drive.AvailableFreeSpace
+                                    'Format'	                    = $drive.DriveFormat
+                                    'Type'	                        = $drive.DriveType
+                                    'Free'	                        = ConvertBytes($drive.AvailableFreeSpace)
+                                    'Free (%)'	                    = [string]$free_percent + ' %'
+                                    'Is Ready'	                    = $drive.IsReady
+                                    'Label'	                        = $drive.VolumeLabel
+                                    'Name'	                        = $drive.Name
+                                    'Root Directory'	            = $drive.RootDirectory
+                                    'Total Size'	                = ConvertBytes($drive.TotalSize)
+                                    'Total Free Space (B)'	        = $drive.TotalFreeSpace
+                                    'Total Size (B)'	            = $drive.TotalSize
+                                    'Used'	                        = ConvertBytes(($drive.TotalSize) - ($drive.AvailableFreeSpace))
+                                    'Used (%)'	                    = [string]$used_percent + ' %'
+                                    'Volume'	                    = $drive.Name
+
+                            } # New-Object
+
+                } # else
+
+
 
 
     <#
@@ -411,23 +479,31 @@ Process {
         $subfolders = Get-ChildItem $path @recurse_switch -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true }
         $subfolder_paths = $subfolders | Select-Object -ExpandProperty FullName
 
-        # Find all subdirectories and enumerate the results
-        ForEach ($folder in $subfolders) {
+
+            # Remove some error messages (if an empty folder is set as a starting path)
+            If ($subfolder_paths.Count -eq $null) {
+                $continue = $true
+            } Else {
+
+                # Find all subdirectories and enumerate the results
+                ForEach ($folder in $subfolders) {
 
 
-            # Increment the counters and update the lower progress bar
-            $number_of_directories++
-            $x++
-            $folder_status = "Folders Found: $($x - $y + ($loop.Count) - 1) (Total: $number_of_directories)"
-            $folder_task = "Currently Processing: $folder"
-            Write-Progress -Id $folder_id -Activity $folder_activity -Status $folder_status -CurrentOperation $folder_task -PercentComplete (( ($x - $y + ($loop.Count) - 2) / $subfolder_paths.Count) * 100)
+                    # Increment the counters and update the lower progress bar
+                    $number_of_directories++
+                    $x++
+                    $folder_status = "Folders Found: $($x - $y + ($loop.Count) - 1) (Total: $number_of_directories)"
+                    $folder_task = "Currently Processing: $folder"
+                    Write-Progress -Id $folder_id -Activity $folder_activity -Status $folder_status -CurrentOperation $folder_task -PercentComplete (( ($x - $y + ($loop.Count) - 2) / $subfolder_paths.Count) * 100)
 
-            # Add the subdirectory properties to the final report
-            $folder_properties = Add-FolderObject $folder
-            $null = $results.Add($folder_properties)
+                    # Add the subdirectory properties to the final report
+                    $folder_properties = Add-FolderObject $folder
+                    $null = $results.Add($folder_properties)
 
 
-        } # ForEach subfolder
+                } # ForEach subfolder
+
+            } # else
 
     } # ForEach path
 
@@ -449,6 +525,14 @@ End {
 
     # Display a summary in console
     $total_size_in_text = ConvertBytes $total_size
+
+
+                # Display the volume data in console
+                $empty_line | Out-String
+                $empty_line | Out-String
+                $drives.PSObject.TypeNames.Insert(0,"Volumes a.k.a. Drives")
+                $drives_selection = $drives | Select-Object 'Volume','Label','Format','Type','Is Ready','Free','Free (%)','Total Size','Used','Used (%)' | Sort-Object 'Volume'
+                $drives_selection | Format-Table -auto
 
 
                 # Catch the Owner-anomalities and notify the user. This final round of enumeration (without another ForEach loop) should probably be done earlier for best results (speed).
@@ -504,13 +588,14 @@ End {
         } # else
 
     $empty_line | Out-String
+    $empty_line | Out-String
     Write-Output $stats_text
     $empty_line | Out-String
 
 
-    # Display some results in a pop-up window (Out-GridView) - about 2/3 fits to the pop-up window
+    # Display some results in a pop-up window (Out-GridView) - about 1/2 fits to the pop-up window
     $results.PSObject.TypeNames.Insert(0,"Processed Directories")
-    $results_selection = $results | Select-Object 'Directory','Owner','Size','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Age (Days)','Read','Read ago (h)','Created on','Last Updated','BaseName','PSChildName','Last AccessTime','Last WriteTime','Creation Time','Extension','Is ReadOnly','Exists','PS Is Container','Attributes','VersionInfo','Folder Name','Name','Parent','Root','PSParentPath','PSPath','PSProvider','Last WriteTime (UTC)','Creation Time (UTC)','Last AccessTime (UTC)','PSDrive'
+    $results_selection = $results | Select-Object 'Directory','Owner','Size','Size (%)','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Age (Days)','Read','Read ago (h)','Created on','Last Updated','Drive (Size)','BaseName','Last AccessTime','Last WriteTime','Creation Time','Extension','Is ReadOnly','Exists','PS Is Container','Attributes','Folder Name','Name','Parent','Root','PSParentPath','PSPath','PSProvider','PSChildName','VersionInfo','Volume Available Free Space (B)','Volume Type','Volume Free','Volume Free (%)','Volume Is Ready','Volume Label','Volume Name','Volume Format','Volume Root Directory','Volume Total Size','Volume Total Free Space (B)','Volume Total Size (B)','Volume Used','Volume Used (%)','Volume','Last WriteTime (UTC)','Creation Time (UTC)','Last AccessTime (UTC)','PSDrive'
     $results_selection | Sort-Object 'raw_size','Files','Subfolders' -Descending | Out-GridView
 
 
@@ -625,13 +710,16 @@ End {
 
     $total_size = ConvertBytes $total_size
 
+    $volumes_summary = $drives_selection | ConvertTo-Html -Fragment -As Table | Set-AlternatingRows -CSS_even_class odd -CSS_odd_class even | Out-String
     $pre = "<h1>Directory Size Report</h1><h3>Listing the contents of ""$($titles -join ", ")"" on $computer</h3>"
-    $post = "<h3><p>Total Number of Folders Processed: $number_of_directories<br />Skipped: $($skipped.Count)<br />Total Space Used:  $total_size</p></h3>Generated: $(Get-Date -Format g)"
+    $post = "<h3>Drive Utilization on $computer</h3> $volumes_summary <h3><p>Total Number of Folders Processed: $number_of_directories<br />Skipped: $($skipped.Count)<br />Total Space Used: $total_size</p></h3>Generated: $(Get-Date -Format g)"
 
 
             # Bypass the user defined sort options, if folder or file sizes or amounts are involved, so that always report largest files and folders first, and those which have the most content inside
             If ($Sort -eq "raw_size") {
                 $sort_command = { Sort-Object -property @{Expression="raw_size";Descending=$true}, @{Expression="Files";Descending=$true}, @{Expression="Subfolders";Descending=$true}, @{Expression="Directory";Descending=$false} }
+            } ElseIf ($Sort -eq "Size (%)") {
+                $sort_command = { Sort-Object -property @{Expression="Size (%)";Descending=$true}, @{Expression="raw_size";Descending=$true}, @{Expression="Files";Descending=$true}, @{Expression="Subfolders";Descending=$true}, @{Expression="Directory";Descending=$false} }
             } ElseIf ($Sort -eq "Average File Size") {
                 $sort_command = { Sort-Object -property @{Expression="Average File Size (B)";Descending=$true}, @{Expression="Files";Descending=$true}, @{Expression="Subfolders";Descending=$true}, @{Expression="Directory";Descending=$false} }
             } ElseIf ($Sort -eq "Average File Size (B)") {
@@ -646,7 +734,7 @@ End {
 
 
     # Create the report and save the it to a file
-    $HTML = $results | Select-Object 'Directory','Owner','Size','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Age (Days)','Read','Read ago (h)','Created on','Last Updated','Folder Name' | Invoke-Command -ScriptBlock $sort_command | ConvertTo-Html -PreContent $pre -PostContent $post -Head $header -As Table | Set-AlternatingRows -CSS_even_class even -CSS_odd_class odd | Out-File $ReportPath\directory_size.html
+    $HTML = $results | Select-Object 'Directory','Owner','Size','Size (%)','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Age (Days)','Read','Read ago (h)','Created on','Last Updated','Drive (Size)' | Invoke-Command -ScriptBlock $sort_command | ConvertTo-Html -PreContent $pre -PostContent $post -Head $header -As Table | Set-AlternatingRows -CSS_even_class even -CSS_odd_class odd | Out-File $ReportPath\directory_size.html
 
 
     # Display the report in the default browser
@@ -670,6 +758,14 @@ End {
 
 
     Write-Verbose "$(Get-Date -Format HH:mm:ss): Script completed."
+
+
+    # Sound the bell if set to do so with the -Audio parameter (ASCII character 7)
+    If ( -not $Audio ) {
+        $continue = $true
+    } Else {
+        [char]7
+    } # else
 
 
 } # End
@@ -788,13 +884,16 @@ End {
 
     $total_size = ConvertBytes $total_size
 
+    $volumes_summary = $drives_selection | ConvertTo-Html -Fragment -As Table | Set-AlternatingRows -CSS_even_class odd -CSS_odd_class even | Out-String
     $pre = "<h1>Directory Size Report</h1><h3>Listing the contents of ""$($titles -join ", ")"" on $computer</h3>"
-    $post = "<h3><p>Total Number of Folders Processed: $number_of_directories<br />Skipped: $($skipped.Count)<br />Total Space Used:  $total_size</p></h3>Generated: $(Get-Date -Format g)"
+    $post = "<h3>Drive Utilization on $computer</h3> $volumes_summary <h3><p>Total Number of Folders Processed: $number_of_directories<br />Skipped: $($skipped.Count)<br />Total Space Used: $total_size</p></h3>Generated: $(Get-Date -Format g)"
 
 
             # Bypass the user defined sort options, if folder or file sizes or amounts are involved, so that always report largest files and folders first, and those which have the most content inside
             If ($Sort -eq "raw_size") {
                 $sort_command = { Sort-Object -property @{Expression="raw_size";Descending=$true}, @{Expression="Files";Descending=$true}, @{Expression="Subfolders";Descending=$true}, @{Expression="Directory";Descending=$false} }
+            } ElseIf ($Sort -eq "Size (%)") {
+                $sort_command = { Sort-Object -property @{Expression="Size (%)";Descending=$true}, @{Expression="raw_size";Descending=$true}, @{Expression="Files";Descending=$true}, @{Expression="Subfolders";Descending=$true}, @{Expression="Directory";Descending=$false} }
             } ElseIf ($Sort -eq "Average File Size") {
                 $sort_command = { Sort-Object -property @{Expression="Average File Size (B)";Descending=$true}, @{Expression="Files";Descending=$true}, @{Expression="Subfolders";Descending=$true}, @{Expression="Directory";Descending=$false} }
             } ElseIf ($Sort -eq "Average File Size (B)") {
@@ -809,7 +908,7 @@ End {
 
 
     # Use the Directory Size final Report object as a email message body
-    $body = $results | Select-Object 'Directory','Owner','Size','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Age (Days)','Read','Read ago (h)','Created on','Last Updated','Folder Name' | Invoke-Command -ScriptBlock $sort_command | ConvertTo-Html -PreContent $pre -PostContent $post -Head $header -As Table | Set-AlternatingRows -CSS_even_class even -CSS_odd_class odd | Out-String
+    $body = $results | Select-Object 'Directory','Owner','Size','Size (%)','raw_size','Files','Subfolders','Average File Size','Average File Size (B)','Written','Written Ago (h)','Age (Days)','Read','Read ago (h)','Created on','Last Updated','Drive (Size)' | Invoke-Command -ScriptBlock $sort_command | ConvertTo-Html -PreContent $pre -PostContent $post -Head $header -As Table | Set-AlternatingRows -CSS_even_class even -CSS_odd_class odd | Out-String
 
 
     # Send the email
@@ -829,7 +928,7 @@ https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize            
 http://2012sg.poshcode.org/4950                                                               # Joel Reed: "Get-DirectorySize"
 http://brianbunke.com/?p=59                                                                   # Brian: "Making PowerShell Emails Pretty"
 http://powershell.com/cs/media/p/7476.aspx                                                    # clayman2: "Disk Space"
-http://powershell.com/cs/media/p/24814.aspx						      # PowerTips Monthly Volume 2: Arrays and Hash Tables
+http://powershell.com/cs/media/p/24814.aspx						                              # PowerTips Monthly Volume 2: Arrays and Hash Tables
 https://technet.microsoft.com/en-us/library/hh849719.aspx                                     # Invoke-Command
 https://technet.microsoft.com/en-us/library/hh849912.aspx                                     # Sort-Object
 
@@ -869,16 +968,20 @@ The -Path parameter accepts a collection of path names (separated by comma) and
 also takes an array of strings for paths to query.
 
 The directories are queried extensively, a wide array of properties, such as
-Directory, Owner, Size, raw_size, File Count, Subfolder Count, Average File Size, 
-Average File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), 
-Created on, Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, 
-Creation Time, Extension, Is ReadOnly, Exists, PS Is Container, Attributes, 
-VersionInfo, Folder Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, 
-Last WriteTime (UTC), Creation Time (UTC), Last AccessTime (UTC) and PSDrive is 
-leveraged from the directories totaling nearly 40 headers / columns. The full 
-report is written to a CSV-file, about 2/3 of the data is displayed in a sortable 
-pop-up window (Out-GridView) and a Directory Size Report (as a HTML file) with 
-the essential information is invoked in the default browser.
+Directory, Owner, Size, Relative Size (Size (%)), raw_size, File Count, Subfolder
+Count, Average File Size, Average File Size (B), Written, Written Ago (h),
+Age (Days), Read, Read ago (h), Created on, Last Updated, BaseName, PSChildName,
+Last AccessTime, Last WriteTime, Creation Time, Extension, Is ReadOnly, Exists,
+PS Is Container, Attributes, VersionInfo, Folder Name, Name, Parent, Root,
+PSParentPath, PSPath, PSProvider, Last WriteTime (UTC), Creation Time (UTC),
+Last AccessTime (UTC), PSDrive, Volume Available Free Space (B), Volume Type,
+Volume Free, Volume Free (%), Volume Is Ready, Volume Label, Volume Name,
+Volume Root Directory, Volume Total Size, Volume Total Free Space (B), Volume
+Total Size (B), Volume Used, Volume Used (%) and Volume is leveraged from the
+directories totaling over 50 headers / columns. The full report is written to
+a CSV-file, about 1/2 of the data is displayed in a sortable pop-up window
+(Out-GridView) and a Directory Size Report (as a HTML file) with the essential
+information is invoked in the default browser.
 
 The -ReportPath parameter defines where the files are saved. The default save
 location of the HTML Directory Size Report (directory_size.html) and the adjacent
@@ -913,7 +1016,7 @@ defined in the query $env:temp gets searched.
 Specifies where the HTML Directory Size Report and the adjacent CSV-file is to be
 saved. The default save location is $env:temp, which points to the current temporary
 file location, which is set in the system. The default -ReportPath save location is
-defined at line 16 with the $ReportPath variable. For usage, please see the Examples 
+defined at line 16 with the $ReportPath variable. For usage, please see the Examples
 below and for more information about $env:temp, please see the Notes section below.
 
 .PARAMETER Sort
@@ -925,9 +1028,9 @@ Even when the -Sort parameter is used, Get-DirectorySize acts partially indepent
 in the background and is actively trying to sort values automatically, so that
 numerical values would be sorted as descending as default while text based columns
 would be sorted as ascending as default. By any means with any command or parameter
-combination will Get-DirectorySize probably not agree to sorting size as ascending,
-so effectively the -Descending parameter is almost exclusively left as a toggle for
-the text based columns.
+combination will Get-DirectorySize probably not agree to sorting size in the HTML 
+Directory Size Report as ascending, so effectively the -Descending parameter is 
+almost exclusively left as a toggle for the text based columns.
 
 In the HTML Directory Size Report all the headers are sortable (with the query
 commands) and some headers have aliases, too. Valid -Sort values are listed below
@@ -943,6 +1046,7 @@ section for further usage examples.
     Directory               Sort by Directory                (param)       Ascending
     Owner                   Sort by Owner                    (param)       Ascending
     Size                    Sort by raw_size                Descending         -
+    "Size (%)"              Sort by Size (%)                Descending         -
     raw_size                Sort by raw_size                Descending         -
     Files                   Sort by Files                   Descending         -
     Subfolders              Sort by Subfolders              Descending         -
@@ -961,7 +1065,6 @@ section for further usage examples.
     Updated                 Sort by Last Updated             (param)       Ascending
     Changed                 Sort by Last Updated             (param)       Ascending
     Last                    Sort by Last Updated             (param)       Ascending
-    "Folder Name"           Sort by Folder Name              (param)       Ascending
 
 
 In the table above, (param) depicts the usage of the -Descending parameter.
@@ -991,11 +1094,15 @@ parameter. Furthermore, since the Average File Size depends on the number of fil
 found, the reported average file size of a folder may differ drastically depending
 on whether the -Recurse parameter was used or not.
 
+.PARAMETER Audio
+If this parameter is used in the query command, an audible beep will occur after 
+the directory size enumeration is finished. 
+
 .OUTPUTS
 Generates an HTML Directory Size Report and an adjacent CSV-file in a specified
 Report Path ($ReportPath = "$env:temp" at line 16), which is user-settable with
-the -ReportPath parameter. Skipped path names, if any, are reported in console. 
-Also displays performance related information about the query process in console 
+the -ReportPath parameter. Skipped path names, if any, are reported in console.
+Also displays performance related information about the query process in console
 after the query has finished. In addition to that...
 
 
@@ -1003,7 +1110,7 @@ One pop-up window "$results_selection" (Out-GridView) with sortable headers (wit
 
         Name                                Description
         ----                                -----------
-        $results_selection                  Displays 2/3 of the full data set
+        $results_selection                  Displays 1/2 of the full data set
 
 
 And also the aforementioned HTML-file "Directory Size Report" and CSV-file at
@@ -1014,7 +1121,9 @@ $env:temp\directory_size.html           : HTML-file          : directory_size.ht
 $env:temp\directory_size.csv            : CSV-file           : directory_size.csv
 
 .NOTES
-Please note that all the parameters can be used in one query command.
+Please note that all the parameters can be used in one query command and that each 
+of the parameters can be "tab completed" before typing them fully (by pressing 
+the [tab] key.
 
 Please note that the default search location is defined at line 15 for the -Path
 parameter (as an alias of -Paths) with the $Paths variable.
@@ -1035,7 +1144,7 @@ http://www.eightforums.com/tutorials/23500-temporary-files-folder-change-locatio
 
     Homepage:           https://github.com/auberginehill/get-directory-size
                         Short URL: http://tinyurl.com/jjl9wng
-    Version:            1.1
+    Version:            1.2
 
 .EXAMPLE
 ./Get-DirectorySize
@@ -1045,7 +1154,7 @@ Uses the default location ($env:temp) for 'listing the contents of' and for stor
 the generated two files. Lists the folders, which are found on the first level (i.e.
 search is done nonrecursively, similarly to a common command "dir", for example).
 The output in the CSV file includes nearly 40 columns of data with each processed
-folder name as a row, the Out-GridView has about 2/3 of the data and, in essence,
+folder name as a row, the Out-GridView has about 1/2 of the data and, in essence,
 the generated HTML Directory Size Report is a summary table with the most relevant
 information. The HTML Directory Size Report is sorted by Size and ordered as
 descending as default (the default order for text based columns is ascending).
@@ -1073,25 +1182,34 @@ since the path names don't contain any space characters
 (./Get-DirectorySize -Path C:\dc01, D:\dc04, E:\chiore).
 
 .EXAMPLE
-./Get-DirectorySize -Path E:\chiore -Sort "Folder Name" -Descending
+./Get-DirectorySize -Path E:\chiore -Sort Directory -Descending
 
 Run the script and report on all the folders in E:\chiore. Sort the data based on
-the "Folder Name" column and arrange the rows in the HTML Directory Size Report as
+the "Directory" column and arrange the rows in the HTML Directory Size Report as
 descending so that last alphabets come to the top and first alphabets will be at the
 bottom. To sort the same query in an ascending order the -Descending parameter may
-be left out from the query command (./Get-DirectorySize -Path E:\chiore -Sort "Folder Name").
+be left out from the query command (./Get-DirectorySize -Path E:\chiore -Sort Directory).
+The sort column name is case-insensitive (as is most of the PowerShell), and since the 
+path name doesn't contain any space characters, it doesn't need to be enveloped with 
+quotation marks. Actually the -Path parameter may be left out from the query command, 
+too, since, for example,
+
+    ./get-directorysize e:\cHIORe -sort directory -descending
+
+is the exact same query command in nature.
 
 .EXAMPLE
-./Get-DirectorySize -Path C:\Users\Dropbox -Recurse
+./Get-DirectorySize -Path C:\Users\Dropbox -Recurse -Audio
 
 Will output a size calculation of C:\Users\Dropbox and include all enclosed
 sub-directories of the sub-directories of the sub-directories and their
 sub-directories as well (the search is done recursively). The output is sorted, as
 per default, on the raw_size property in an descending order, displaying the largest
-directories on top and the smallest directories at the bottom. Due to the
-partial automation in Get-DirectorySize, this is the same command as
+directories on top and the smallest directories at the bottom. After the the script 
+has finished its work, an audible "bell" sound is evoked. Due to the partial 
+automation in Get-DirectorySize, this is the same command as
 
-    ./Get-DirectorySize -Path C:\Users\Dropbox -Sort size -Descending -Recurse
+    ./Get-DirectorySize -Path C:\Users\Dropbox -Sort size -Descending -Recurse -Audio
 
 in essence.
 
@@ -1159,6 +1277,7 @@ https://technet.microsoft.com/en-us/library/hh847743.aspx
 https://technet.microsoft.com/en-us/library/hh849719.aspx
 https://technet.microsoft.com/en-us/library/hh849912.aspx
 http://social.technet.microsoft.com/wiki/contents/articles/15994.powershell-advanced-function-parameter-attributes.aspx
+https://technet.microsoft.com/en-us/library/ee692803.aspx
 http://www.techrepublic.com/blog/10-things/10-powershell-commands-every-windows-admin-should-know/
 
 #>
