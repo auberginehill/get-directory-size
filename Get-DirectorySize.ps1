@@ -1123,7 +1123,7 @@ $env:temp\directory_size.csv            : CSV-file           : directory_size.cs
 .NOTES
 Please note that all the parameters can be used in one query command and that each 
 of the parameters can be "tab completed" before typing them fully (by pressing 
-the [tab] key.
+the [tab] key).
 
 Please note that the default search location is defined at line 15 for the -Path
 parameter (as an alias of -Paths) with the $Paths variable.
