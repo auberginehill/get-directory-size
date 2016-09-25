@@ -36,7 +36,7 @@
       <br />
       <br />To effectively use Get-DirectorySize, a path, paths or path names to a directory should be specified (with the <code>-Path</code> parameter), as by default, only <code>$env:temp</code> gets searched. The paths should be valid file system paths to a directory (a full path name of a directory (i.e. folder path such as <code>C:\Windows</code>)). In case the path name includes space characters, quotation marks around the path name are mandatory. The <code>-Path</code> parameter accepts a collection of path names (separated by comma) and also takes an array of strings for paths to query.
       <br />
-      <br />The directories are queried extensively, a wide array of properties, such as Directory, Owner, Size, raw_size, File Count, Subfolder Count, Average File Size, Average File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), Created on, Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, Creation Time, Extension, Is ReadOnly, Exists, PS Is Container, Attributes, VersionInfo, Folder Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, Last WriteTime (UTC), Creation Time (UTC), Last AccessTime (UTC) and PSDrive is leveraged from the directories totaling nearly 40 headers / columns. The full report is written to a CSV-file, about 2/3 of the data is displayed in a sortable pop-up window (Out-GridView) and a Directory Size Report (as a HTML file) with the essential information is invoked in the default browser.
+      <br />The directories are queried extensively, a wide array of properties, such as Directory, Owner, Size, Relative Size (Size (%)), raw_size, File Count, Subfolder Count, Average File Size, Average File Size (B), Written, Written Ago (h), Age (Days), Read, Read ago (h), Created on, Last Updated, BaseName, PSChildName, Last AccessTime, Last WriteTime, Creation Time, Extension, Is ReadOnly, Exists, PS Is Container, Attributes, VersionInfo, Folder Name, Name, Parent, Root, PSParentPath, PSPath, PSProvider, Last WriteTime (UTC), Creation Time (UTC), Last AccessTime (UTC), PSDrive, Volume Available Free Space (B), Volume Type, Volume Free, Volume Free (%), Volume Is Ready, Volume Label, Volume Name, Volume Root Directory, Volume Total Size, Volume Total Free Space (B), Volume Total Size (B), Volume Used, Volume Used (%) and Volume is leveraged from the directories totaling over 50 headers / columns. The full report is written to a CSV-file, about 1/2 of the data is displayed in a sortable pop-up window (Out-GridView) and a Directory Size Report (as a HTML file) with the essential information is invoked in the default browser.
       <br />
       <br />The <code>-ReportPath</code> parameter defines where the files are saved. The default save location of the HTML Directory Size Report (<code>directory_size.html</code>) and the adjacent CSV-file (<code>directory_size.csv</code>) is <code>$env:temp</code>, which points to the current temporary file location, which is set in the system (– for more information, please see the Notes section).
       <br />
@@ -49,7 +49,7 @@
    </tr>
    <tr>
       <td style="padding:6px"><strong>Version:</strong></td>
-      <td style="padding:6px">1.1</td>
+      <td style="padding:6px">1.2</td>
    </tr>
    <tr>
         <td style="padding:6px"><strong>Sources:</strong></td>
@@ -128,7 +128,7 @@
                     <li>
                         <h5>Parameter <code>-Sort</code></h5>
                         <p>Specifies which column is the primary sort column in the HTML Directory Size Report. Only one column may be selected in one query as the primary column. If <code>-Sort</code> parameter is not defined, Get-DirectorySize will try to sort by Size.</p>
-                        <p>Even when the <code>-Sort</code> parameter is used, Get-DirectorySize acts partially indepently in the background and is actively trying to sort values automatically, so that numerical values would be sorted as descending as default while text based columns would be sorted as ascending as default. By any means with any command or parameter combination will Get-DirectorySize probably not agree to sorting size as ascending, so effectively the <code>-Descending</code> parameter is almost exclusively left as a toggle for the text based columns.</p>
+                        <p>Even when the <code>-Sort</code> parameter is used, Get-DirectorySize acts partially indepently in the background and is actively trying to sort values automatically, so that numerical values would be sorted as descending as default while text based columns would be sorted as ascending as default. By any means with any command or parameter combination will Get-DirectorySize probably not agree to sorting size in the HTML Directory Size Report as ascending, so effectively the <code>-Descending</code> parameter is almost exclusively left as a toggle for the text based columns.</p>
                         <p>In the HTML Directory Size Report all the headers are sortable (with the query commands) and some headers have aliases, too. Valid <code>-Sort</code> values are listed below along with the default order (descending or ascending). Please also see the Examples section for further usage examples. </p>
                         <ol>
                             <h4>Valid <code>-Sort</code> values:</h4>
@@ -157,6 +157,12 @@
                                     </tr>
                                     <tr>
                                         <td style="padding:6px"><code>Size</code></td>
+                                        <td style="padding:6px">Sort by raw_size</td>
+                                        <td align="center" style="padding:6px">Descending</td>
+                                        <td align="center" style="padding:6px">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:6px"><code>"Size (%)"</code></td>
                                         <td style="padding:6px">Sort by raw_size</td>
                                         <td align="center" style="padding:6px">Descending</td>
                                         <td align="center" style="padding:6px">-</td>
@@ -294,6 +300,11 @@
                         <br />
                         <br />Please note, that even when the <code>-Recurse</code> parameter is not used, and despite its toll to the performance of the script (speed), Get-DirectorySize will try to query some data, such as the overall size of the folder, recursively. This is intended action and is one of the key elements and main characteristics of Get-DirectorySize. The total size of a folder cannot be known, if all of the content is not known. The file count and subfolder count will, however, follow the path of the <code>-Recurse</code> parameter. Furthermore, since the Average File Size depends on the number of files found, the reported average file size of a folder may differ drastically depending on whether the <code>-Recurse</code> parameter was used or not.</p>
                     </li>
+                    
+                      <li>
+                        <h5>Parameter <code>-Audio</code></h5>
+                        <p>If this parameter is used in the query command, an audible beep will occur after the directory size enumeration is finished.</p>
+                    </li>
                 </p>
             </ul>
         </td>
@@ -330,7 +341,7 @@
                             </tr>
                             <tr>
                                 <td style="padding:6px"><code>$results_selection</code></a></td>
-                                <td style="padding:6px">Displays 2/3 of the full data set</td>
+                                <td style="padding:6px">Displays 1/2 of the full data set</td>
                             </tr>
                         </table>
                     </p>
@@ -374,7 +385,7 @@
         <th>:warning:</th>
         <td style="padding:6px">
             <ul>
-                <li>Please note that all the parameters can be used in one query command.</li>
+                <li>Please note that all the parameters can be used in one query command and that each of the parameters can be "tab completed" before typing them fully (by pressing the <code>[tab]</code> key.</li>
             </ul>
         </td>
     </tr>
@@ -383,7 +394,7 @@
         <td style="padding:6px">
             <ul>
                 <p>
-                    <li>Please note that the default search location is defined at line 15 for the <code>-Path</code> parameter (as an alias of <code>-Paths</code>) with the <code>$Paths</code> variable.</li>
+                    <li>Please note that the default search location is defined at line 15 for the <code>-Path</code> parameter (as an alias of <code>-Paths</code>) with the <code>$Paths</code> variable. </li>
                 </p>
                 <p>
                     <li>Please also note that the two files are created in a directory, which is end-user settable in each query command with the <code>-ReportPath</code> parameter. The default save location is defined with the <code>$ReportPath</code> variable (at line 16). The <code>$env:temp</code> variable points to the current temp folder. The default value of the <code>$env:temp</code> variable is <code>C:\Users\&lt;username&gt;\AppData\Local\Temp</code> (i.e. each user account has their own separate temp folder at path <code>%USERPROFILE%\AppData\Local\Temp</code>). To see the current temp path, for instance a command
@@ -421,7 +432,7 @@
             <ol>
                 <p>
                     <li><code>./Get-DirectorySize</code><br />
-                    Run the script. Please notice to insert <code>./</code> or <code>.\</code> before the script name. Uses the default location (<code>$env:temp</code>) for 'listing the contents of' and for storing the generated two files. Lists the folders, which are found on the first level (i.e. search is done nonrecursively, similarly to a common command "<code>dir</code>", for example). The output in the CSV file includes nearly 40 columns of data with each processed folder name as a row, the Out-GridView has about 2/3 of the data and, in essence, the generated HTML Directory Size Report is a summary table with the most relevant information. The HTML Directory Size Report is sorted by Size and ordered as descending as default (the default order for text based columns is ascending).</li>
+                    Run the script. Please notice to insert <code>./</code> or <code>.\</code> before the script name. Uses the default location (<code>$env:temp</code>) for 'listing the contents of' and for storing the generated two files. Lists the folders, which are found on the first level (i.e. search is done nonrecursively, similarly to a common command "<code>dir</code>", for example). The output in the CSV file includes nearly 40 columns of data with each processed folder name as a row, the Out-GridView has about 1/2 of the data and, in essence, the generated HTML Directory Size Report is a summary table with the most relevant information. The HTML Directory Size Report is sorted by Size and ordered as descending as default (the default order for text based columns is ascending).</li>
                 </p>
                 <p>
                     <li><code>help ./Get-DirectorySize -Full</code><br />
@@ -436,14 +447,18 @@
                     Run the script and report on all folders, which are found in <code>C:\dc01</code>, <code>D:\dc04</code> and <code>E:\chiore</code>. Please note that the -Path is not mandatory in this example, but it could be included, too, and the quotation marks can be left out since the path names don't contain any space characters (<code>./Get-DirectorySize -Path C:\dc01, D:\dc04, E:\chiore</code>).</li>
                 </p>
                 <p>
-                    <li><code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name" -Descending</code><br />
-                    Run the script and report on all the folders in <code>E:\chiore</code>. Sort the data based on the "Folder Name" column and arrange the rows in the HTML Directory Size Report as descending so that last alphabets come to the top and first alphabets will be at the bottom. To sort the same query in an ascending order the <code>-Descending</code> parameter may be left out from the query command (<code>./Get-DirectorySize -Path E:\chiore -Sort "Folder Name"</code>).</li>
+                    <li><code>./Get-DirectorySize -Path E:\chiore -Sort Directory -Descending</code><br />
+                    Run the script and report on all the folders in <code>E:\chiore</code>. Sort the data based on the "Directory" column and arrange the rows in the HTML Directory Size Report as descending so that last alphabets come to the top and first alphabets will be at the bottom. To sort the same query in an ascending order the <code>-Descending</code> parameter may be left out from the query command (<code>./Get-DirectorySize -Path E:\chiore -Sort Directory</code>). The sort column name is case-insensitive (as is most of the PowerShell), and since the path name doesn't contain any space characters, it doesn't need to be enveloped with quotation marks. Actually the <code>-Path</code> parameter may be left out from the query command, too, since, for example,
+                    <br />
+                    <br /><code>./get-directorysize e:\cHIORe -sort directory -descending</code>
+                    <br />
+                    <br />is the exact same query command in nature.</li>
                 </p>
                 <p>
-                    <li><code>./Get-DirectorySize -Path C:\Users\Dropbox -Recurse</code><br />
-                    Will output a size calculation of <code>C:\Users\Dropbox</code> and include all enclosed sub-directories of the sub-directories of the sub-directories and their sub-directories as well (the search is done recursively). The output is sorted, as per default, on the raw_size property in an descending order, displaying the largest directories on top and the smallest directories at the bottom. Due to the partial automation in Get-DirectorySize, this is the same command as
+                    <li><code>./Get-DirectorySize -Path C:\Users\Dropbox -Recurse -Audio</code><br />
+                    Will output a size calculation of <code>C:\Users\Dropbox</code> and include all enclosed sub-directories of the sub-directories of the sub-directories and their sub-directories as well (the search is done recursively). The output is sorted, as per default, on the raw_size property in an descending order, displaying the largest directories on top and the smallest directories at the bottom. After the the script has finished its work, an audible "bell" sound is evoked. Due to the partial automation in Get-DirectorySize, this is the same command as
                     <br />
-                    <br /><code>./Get-DirectorySize -Path C:\Users\Dropbox -Sort size -Descending -Recurse</code>
+                    <br /><code>./Get-DirectorySize -Path C:\Users\Dropbox -Sort size -Descending -Recurse -Audio</code>
                     <br />
                     <br />in essence.</li>
                 </p>
@@ -536,7 +551,7 @@
         <td style="padding:6px"><a href="https://github.com/auberginehill/get-directory-size">Script Homepage</a></td>
     </tr>
     <tr>
-        <th rowspan="13"></th>
+        <th rowspan="14"></th>
         <td style="padding:6px">Martin Pugh: <a href="https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize">Get-FolderSizes</a></td>
     </tr>
     <tr>
@@ -568,6 +583,9 @@
     </tr>
     <tr>
         <td style="padding:6px"><a href="http://social.technet.microsoft.com/wiki/contents/articles/15994.powershell-advanced-function-parameter-attributes.aspx">PowerShell: Advanced Function Parameter Attributes</a></td>
+    </tr>
+    <tr>
+        <td style="padding:6px"><a href="https://technet.microsoft.com/en-us/library/ee692803.aspx">Working with Hash Tables</a></td>
     </tr>
     <tr>
         <td style="padding:6px"><a href="http://www.techrepublic.com/blog/10-things/10-powershell-commands-every-windows-admin-should-know/">10 PowerShell commands every Windows admin should know</a></td>
