@@ -61,7 +61,7 @@
                 </tr>
                 <tr>
                     <td style="padding:6px">Martin Pugh:</td>
-                    <td style="padding:6px"><a href="https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize">Get-FolderSizes</a></td>
+                    <td style="padding:6px"><a href="https://community.spiceworks.com/scripts/show/1738-get-foldersizes">Get-FolderSizes</a></td>
                 </tr>
                 <tr>
                     <td style="padding:6px">Joel Reed:</td>
@@ -552,7 +552,7 @@
     </tr>
     <tr>
         <th rowspan="14"></th>
-        <td style="padding:6px">Martin Pugh: <a href="https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize">Get-FolderSizes</a></td>
+        <td style="padding:6px">Martin Pugh: <a href="https://community.spiceworks.com/scripts/show/1738-get-foldersizes">Get-FolderSizes</a></td>
     </tr>
     <tr>
         <td style="padding:6px">Joel Reed: <a href="http://2012sg.poshcode.org/4950">Get-DirectorySize</a></td>
