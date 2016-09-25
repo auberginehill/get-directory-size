@@ -924,11 +924,11 @@ End {
  |_____/ \___/ \__,_|_|  \___\___|
 
 
-https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize                          # Martin Pugh: "Get-FolderSizes"
+https://community.spiceworks.com/scripts/show/1738-get-foldersizes                            # Martin Pugh: "Get-FolderSizes"
 http://2012sg.poshcode.org/4950                                                               # Joel Reed: "Get-DirectorySize"
 http://brianbunke.com/?p=59                                                                   # Brian: "Making PowerShell Emails Pretty"
 http://powershell.com/cs/media/p/7476.aspx                                                    # clayman2: "Disk Space"
-http://powershell.com/cs/media/p/24814.aspx						                              # PowerTips Monthly Volume 2: Arrays and Hash Tables
+http://powershell.com/cs/media/p/24814.aspx						      # PowerTips Monthly Volume 2: Arrays and Hash Tables
 https://technet.microsoft.com/en-us/library/hh849719.aspx                                     # Invoke-Command
 https://technet.microsoft.com/en-us/library/hh849912.aspx                                     # Sort-Object
 
@@ -1266,7 +1266,7 @@ file is about to happen. Overwriting a file with the New-Item cmdlet requires us
 For more information, please type "help New-Item -Full".
 
 .LINK
-https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize
+https://community.spiceworks.com/scripts/show/1738-get-foldersizes
 http://2012sg.poshcode.org/4950
 http://brianbunke.com/?p=59
 http://powershell.com/cs/media/p/7476.aspx
