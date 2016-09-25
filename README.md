@@ -163,7 +163,7 @@
                                     </tr>
                                     <tr>
                                         <td style="padding:6px"><code>"Size (%)"</code></td>
-                                        <td style="padding:6px">Sort by raw_size</td>
+                                        <td style="padding:6px">Sort by Size (%)</td>
                                         <td align="center" style="padding:6px">Descending</td>
                                         <td align="center" style="padding:6px">-</td>
                                     </tr>
