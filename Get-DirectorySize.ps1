@@ -990,7 +990,7 @@ file location, which is set in the system (- for more information, please see
 the Notes section).
 
 While the parameters -Path, -Recurse and -ReportPath (along with the -Audio
-parameter(, which adds an audible beeb after the query is finished)) modify 
+parameter(, which adds an audible beep after the query is finished)) modify 
 holistically the behavior of Get-DirectorySize, the other parameters -Sort 
 and -Descending toggle how and in which way the data is displayed in the HTML
 Directory Size Report. The usage and behavior of each parameter is discussed 
