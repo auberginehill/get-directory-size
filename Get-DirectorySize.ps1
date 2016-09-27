@@ -989,11 +989,13 @@ CSV-file (directory_size.csv) is $env:temp, which points to the current temporar
 file location, which is set in the system (- for more information, please see
 the Notes section).
 
-While the parameters -Path, -Recurse and -ReportPath modify holistically the
-behavior of Get-DirectorySize, the other parameters -Sort and -Descending toggle
-how and in which way the data is displayed in the HTML Directory Size Report.
-The usage and behavior of each parameter is discussed in further detail below.
-This script is based on Martin Pugh's PowerShell script "Get-FolderSizes"
+While the parameters -Path, -Recurse and -ReportPath (along with the -Audio
+parameter(, which adds an audible beeb after the query is finished)) modify 
+holistically the behavior of Get-DirectorySize, the other parameters -Sort 
+and -Descending toggle how and in which way the data is displayed in the HTML
+Directory Size Report. The usage and behavior of each parameter is discussed 
+in further detail below. This script is based on Martin Pugh's PowerShell 
+script "Get-FolderSizes"
 (https://community.spiceworks.com/scripts/show/1738-Get-DirectorySize).
 
 .PARAMETER Path
