@@ -219,12 +219,12 @@ Begin {
             $elapsed_result = [string]''
         } # else (if)
 
-            If ($elapsed_result.Contains("0 h")) {
-                $elapsed_result = $elapsed_result.Replace("0 h","")
-                } If ($elapsed_result.Contains("0 min")) {
-                    $elapsed_result = $elapsed_result.Replace("0 min","")
-                    } If ($elapsed_result.Contains("0 sec")) {
-                    $elapsed_result = $elapsed_result.Replace("0 sec","")
+            If ($elapsed_result.Contains(" 0 h")) {
+                $elapsed_result = $elapsed_result.Replace(" 0 h"," ")
+                } If ($elapsed_result.Contains(" 0 min")) {
+                    $elapsed_result = $elapsed_result.Replace(" 0 min"," ")
+                    } If ($elapsed_result.Contains(" 0 sec")) {
+                    $elapsed_result = $elapsed_result.Replace(" 0 sec"," ")
             } # if ($elapsed_result: first)
 
     Return $elapsed_result
@@ -632,12 +632,12 @@ End {
         } # else (if)
 
 
-            If ($runtime_result.Contains("0 h")) {
-                $runtime_result = $runtime_result.Replace("0 h","")
-                } If ($runtime_result.Contains("0 min")) {
-                    $runtime_result = $runtime_result.Replace("0 min","")
-                    } If ($runtime_result.Contains("0 sec")) {
-                    $runtime_result = $runtime_result.Replace("0 sec","")
+            If ($runtime_result.Contains(" 0 h")) {
+                $runtime_result = $runtime_result.Replace(" 0 h"," ")
+                } If ($runtime_result.Contains(" 0 min")) {
+                    $runtime_result = $runtime_result.Replace(" 0 min"," ")
+                    } If ($runtime_result.Contains(" 0 sec")) {
+                    $runtime_result = $runtime_result.Replace(" 0 sec"," ")
             } # if ($runtime_result: first)
 
 
