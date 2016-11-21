@@ -947,7 +947,7 @@ https://technet.microsoft.com/en-us/library/hh849912.aspx                       
 <#
 
 .SYNOPSIS
-Retrieves the folder sizes in a specified directory or directories.
+Retrieves the folder sizes of a specified directory or directories.
 
 .DESCRIPTION
 Get-DirectorySize returns the size of a directory or directories (paths) specificed
